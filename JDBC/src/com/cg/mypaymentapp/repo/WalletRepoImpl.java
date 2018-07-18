@@ -42,13 +42,19 @@ public class WalletRepoImpl implements WalletRepo{
 	{
 		try (Connection con = DBUtil.getConnection())
 		{				
-			PreparedStatement pstm = con.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?,?)");
+			PreparedStatement pstm = con.prepareStatement("INSERT INTO CUSTOMERS VALUES(?,?,?)");
 			pstm.setString(1, customer.getMobileNo());
 			pstm.setString(2, customer.getName());
 			Wallet wallet = customer.getWallet();
 			BigDecimal balance = wallet.getBalance();
 			pstm.setBigDecimal(3, balance);
-			pstm.execute();
+			try {
+				pstm.execute();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			
 		} 
 		catch (InvalidInputException |ClassNotFoundException |SQLException e) 
@@ -61,15 +67,7 @@ public class WalletRepoImpl implements WalletRepo{
 		}
 		return true;
 	}
-	
-	else 
-	{
-		throw new InvalidInputException("A user with this number already exists, enter a new number.");
-		
-	}
-	
-	
-			
+	return false;		
 	}
 
 	public Customer findOne(String mobileNo) 
@@ -78,7 +76,7 @@ public class WalletRepoImpl implements WalletRepo{
 		
 		try(Connection con = DBUtil.getConnection())
 		{
-			PreparedStatement pstm = con.prepareStatement("SELECT * FROM CUSTOMER WHERE id=?");
+			PreparedStatement pstm = con.prepareStatement("SELECT * FROM CUSTOMERS WHERE id=?");
 			pstm.setString(1, mobileNo);
 			ResultSet res = pstm.executeQuery();
 			
@@ -107,7 +105,7 @@ public class WalletRepoImpl implements WalletRepo{
 	public void updateBalance(String number,BigDecimal balance) {
 		try(Connection con = DBUtil.getConnection())
 		{
-			PreparedStatement pstm = con.prepareStatement("UPDATE CUSTOMER SET BALANCE = ? WHERE id=?");
+			PreparedStatement pstm = con.prepareStatement("UPDATE CUSTOMERS SET BALANCE = ? WHERE id=?");
 			pstm.setBigDecimal(1, balance);
 			pstm.setString(2, number);
 			ResultSet res = pstm.executeQuery();
