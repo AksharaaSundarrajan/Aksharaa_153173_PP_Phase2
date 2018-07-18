@@ -5,6 +5,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,21 +19,23 @@ import com.cg.mypaymentapp.service.WalletServiceImpl;
 
 public class TestClass {
 
-	
+	String mobile ="9963242422";
+	BigDecimal amount = new BigDecimal("100.00");
 	WalletService service;
 	
 	@Before
 	public void initData(){
-		 Map<String,Customer> data= new HashMap<String, Customer>();
-		 Customer cust1=new Customer("Amit", "9900112212",new Wallet(new BigDecimal(9000)));
-		 Customer cust2=new Customer("Ajay", "9963242422",new Wallet(new BigDecimal(6000)));
-		 Customer cust3=new Customer("Yogini", "9922950519",new Wallet(new BigDecimal(7000)));
-				
-		 data.put("9900112212", cust1);
-		 data.put("9963242422", cust2);	
-		 data.put("9922950519", cust3);	
-			service= new WalletServiceImpl(data);
-			
+		 service= new WalletServiceImpl();
+		 Customer cust2=service.createAccount("Ajay", "9963242422",new BigDecimal(6000));
+		 Customer cust1=service.createAccount("Amit", "9900112212",new BigDecimal(9000));
+		 Customer cust3=service.createAccount("Yogini", "9922950519",new BigDecimal(7000));
+		 
+	}
+	
+	@After
+	public void afterExec()
+	{
+		
 	}
 	//1
 	@Test(expected=InvalidInputException.class)
@@ -45,10 +48,7 @@ public class TestClass {
 	@Test
 	public void  testShowBalanceValidNumber()
 	{
-		Customer cust = new Customer();
-		String mobileNumber = "9900112212";
-		cust = service.showBalance(mobileNumber);
-		System.out.println(cust);
+		Customer cust = service.showBalance("9963242422");
 	}
 	//22
 	@Test
@@ -56,9 +56,7 @@ public class TestClass {
 	{
 		Customer cust = new Customer();
 		String name ="Aksharaa";
-		String number = "9963242422";
-		BigDecimal amount = new BigDecimal("1234.02");
-		cust = service.createAccount(name, number, amount);
+		cust = service.createAccount(name, mobile, amount);
 		
 	}
 	//3
@@ -67,20 +65,16 @@ public class TestClass {
 	{
 		Customer cust = new Customer();
 		String name =" ";
-		String number = "9963242422";
-		BigDecimal amount = new BigDecimal("1234.02");
-		cust = service.createAccount(name, number, amount);
+		cust = service.createAccount(name, mobile, amount);
 		
 	}
 	//4
-	@Test(expected=InvalidInputException.class)
+	@Test(expected=NullPointerException.class)
 	public void createAccountInvalidName2()
 	{
 		
 		String name =null;
-		String number = "9963242422";
-		BigDecimal amount = new BigDecimal("1234.02");
-		service.createAccount(name, number, amount);
+		service.createAccount(name, mobile, amount);
 		
 	}
 	
@@ -91,7 +85,6 @@ public class TestClass {
 		Customer cust = new Customer();
 		String name ="Aksharaa";
 		String number = "99632";
-		BigDecimal amount = new BigDecimal("1234.02");
 		cust = service.createAccount(name, number, amount);
 		
 	}
@@ -101,9 +94,9 @@ public class TestClass {
 	{
 		Customer cust = new Customer();
 		String name ="Aksharaa";
-		String number = "9963242422";
+		
 		BigDecimal amount = new BigDecimal("0.0");
-		cust = service.createAccount(name, number, amount);
+		cust = service.createAccount(name, mobile, amount);
 		
 	}	
 	
@@ -125,20 +118,18 @@ public class TestClass {
 	{
 		Customer cust = new Customer();
 		String name ="Aksharaa";
-		String number = "9963242422";
+		
 		BigDecimal amount = new BigDecimal("-100.00");
-		cust = service.createAccount(name, number, amount);
+		cust = service.createAccount(name, mobile, amount);
 		
 	}
 	//23
 	@Test
 	public void fundTransferValid()
 	{
-		Customer cust = new Customer();
 		String sourceMobile ="9900112212";
 		String targetMobile = "9963242422";
-		BigDecimal amount = new BigDecimal("100.00");
-		cust = service.fundTransfer(sourceMobile, targetMobile, amount);
+		service.fundTransfer(sourceMobile, targetMobile, amount);
 		
 	}
 	//8
@@ -167,22 +158,20 @@ public class TestClass {
 	@Test(expected=InvalidInputException.class)
 	public void fundTransferInvalidAmount()
 	{
-		Customer cust = new Customer();
+		
 		String sourceMobile ="9922950519";
 		String targetMobile = "9963242422";
-		BigDecimal amount = new BigDecimal("0.00");
-		cust = service.fundTransfer(sourceMobile, targetMobile, amount);
-		
+		BigDecimal amount = new BigDecimal("0");
+		service.fundTransfer(sourceMobile, targetMobile, amount);
 	}
 	//21
 	@Test(expected=InvalidInputException.class)
 	public void fundTransferInvalidAmount2()
 	{
-		Customer cust = new Customer();
 		String sourceMobile ="9922950519";
 		String targetMobile = "9963242422";
 		BigDecimal amount = new BigDecimal("-100.00");
-		cust = service.fundTransfer(sourceMobile, targetMobile, amount);
+		service.fundTransfer(sourceMobile, targetMobile, amount);
 		
 	}
 	//11
@@ -200,21 +189,19 @@ public class TestClass {
 	@Test(expected=InsufficientBalanceException.class)
 	public void fundTransferInsufficientBalance()
 	{
-		Customer cust = new Customer();
-		String sourceMobile ="909090";
+		String sourceMobile ="9922950519";
 		String targetMobile = "9963242422";
 		BigDecimal amount = new BigDecimal("1000000.00");
-		cust = service.fundTransfer(sourceMobile, targetMobile, amount);
+		service.fundTransfer(sourceMobile, targetMobile, amount);
 		
 	}
 	//24
 	@Test
 	public void depositAmountValid()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
+		
 		BigDecimal amount = new BigDecimal("100.00");
-		cust = service.depositAmount(mobile, amount);
+		service.depositAmount(mobile, amount);
 	}
 	//13
 	@Test(expected=InvalidInputException.class)
@@ -229,27 +216,26 @@ public class TestClass {
 	@Test(expected=InvalidInputException.class)
 	public void depositAmountInvalidAmount1()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
-		BigDecimal amount = new BigDecimal("0.00");
-		cust = service.depositAmount(mobile, amount);
+		
+		
+		BigDecimal amount = new BigDecimal("0");
+		service.depositAmount(mobile, amount);
 	}
 	//15
 	@Test(expected=InvalidInputException.class)
 	public void depositAmountInvalidAmount2()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
-		cust = service.depositAmount(mobile, new BigDecimal(-100));
+		
+		BigDecimal amount = new BigDecimal("100");
+		service.depositAmount(mobile, amount.negate());
 	}
 	//25
 	@Test
 	public void withdrawAmountValid()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
+		
 		BigDecimal amount = new BigDecimal("100.00");
-		cust = service.withdrawAmount(mobile, amount);
+		service.withdrawAmount(mobile, amount);
 	}
 	//16
 	@Test(expected=InvalidInputException.class)
@@ -264,28 +250,25 @@ public class TestClass {
 	@Test(expected=InvalidInputException.class)
 	public void withdrawAmountInvalidAmount1()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
+		
 		BigDecimal amount = new BigDecimal("0.00");
-		cust = service.withdrawAmount(mobile, amount);
+		service.withdrawAmount(mobile, amount);
 	}
 	//18
 	@Test(expected=InvalidInputException.class)
 	public void withdrawAmountInvalidAmount2()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
-		BigDecimal amount = new BigDecimal("-100.00");
-		cust = service.withdrawAmount(mobile, amount);
+		
+		BigDecimal amount = new BigDecimal("100.00");
+		service.withdrawAmount(mobile, amount.negate());
 	}
 	//19
 	@Test(expected=InsufficientBalanceException.class)
 	public void withdrawAmountInsufficientBalance()
 	{
-		Customer cust = new Customer();
-		String mobile ="9963242422";
+		
 		BigDecimal amount = new BigDecimal("1000000.00");
-		cust = service.withdrawAmount(mobile, amount);
+		service.withdrawAmount(mobile, amount);
 	}
 	
 
